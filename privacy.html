@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy — AI Weaver</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Caveat:wght@400;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper: #faf6ee;
+      --paper-2: #f3ecdc;
+      --ink: #1d1a14;
+      --ink-soft: #5a5346;
+      --rule: #e3dccc;
+      --tomato: #e85a3c;
+      --tomato-soft: #fbd9cf;
+      --olive: #6b7a3a;
+      --mustard: #e2a93a;
+    }
+
+    html { scroll-behavior: smooth; }
+    body {
+      background: var(--paper); color: var(--ink);
+      font-family: 'DM Sans', sans-serif; font-size: 16px; line-height: 1.6;
+      -webkit-font-smoothing: antialiased; overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(232,90,60,0.06), transparent 50%),
+        radial-gradient(ellipse at 90% 80%, rgba(226,169,58,0.05), transparent 50%);
+    }
+    body::before {
+      content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+      background-image: radial-gradient(circle at 1px 1px, rgba(29,26,20,0.04) 1px, transparent 0);
+      background-size: 22px 22px;
+    }
+
+    /* NAV — identical to ./ */
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 40px;
+      background: rgba(250,246,238,0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px dashed var(--rule);
+    }
+    .nav-logo { display: flex; align-items: baseline; gap: 6px; text-decoration: none; color: var(--ink); }
+    .nav-logo .mark {
+      font-family: 'Instrument Serif', serif;
+      font-size: 28px; line-height: 1; font-style: italic;
+    }
+    .nav-logo .mark::after { content: '.'; color: var(--tomato); }
+    .nav-logo .sub { font-family: 'Caveat'; font-size: 18px; color: var(--ink-soft); transform: rotate(-3deg); display: inline-block; }
+    .nav-links { display: flex; gap: 30px; }
+    .nav-links a {
+      color: var(--ink-soft); text-decoration: none; font-size: 14px;
+      position: relative;
+    }
+    .nav-links a:hover { color: var(--tomato); }
+    .nav-links a.active {
+      color: var(--tomato);
+    }
+    .nav-links a.active::after {
+      content: ''; position: absolute; left: -2px; right: -2px; bottom: -6px;
+      height: 6px;
+      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 6' preserveAspectRatio='none'><path d='M2 4 Q 25 1 50 3 T 98 3' stroke='%23e85a3c' stroke-width='2' fill='none' stroke-linecap='round'/></svg>") no-repeat center / 100% 100%;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 22px;
+      background: var(--ink); color: var(--paper);
+      border-radius: 100px; text-decoration: none; font-weight: 500; font-size: 14px;
+      border: 2px solid var(--ink); box-shadow: 3px 3px 0 var(--tomato);
+      transition: transform 0.12s, box-shadow 0.12s;
+    }
+    .btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--tomato); }
+    .btn.tomato { background: var(--tomato); border-color: var(--tomato); box-shadow: 3px 3px 0 var(--ink); }
+    .btn.tomato:hover { box-shadow: 4px 4px 0 var(--ink); }
+    .btn.ghost { background: transparent; color: var(--ink); box-shadow: none; }
+    .btn.ghost:hover { background: var(--paper-2); transform: none; box-shadow: none; }
+
+    /* HERO — same vibe as ./: text left, scrapbook visual right */
+    .hero {
+      max-width: 1200px; margin: 0 auto;
+      padding: 72px 40px 60px;
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1.1fr 0.9fr;
+      gap: 60px; align-items: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: 'Caveat'; font-size: 22px; color: var(--tomato);
+      transform: rotate(-2deg); margin-bottom: 18px;
+    }
+    .hero-eyebrow a { color: var(--tomato); text-decoration: none; border-bottom: 1px dashed var(--tomato); }
+    .hero-eyebrow a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+
+    h1 {
+      font-family: 'Instrument Serif', serif; font-weight: 400;
+      font-size: clamp(54px, 7vw, 96px);
+      line-height: 0.98; letter-spacing: -1.5px;
+      color: var(--ink); margin-bottom: 26px;
+    }
+    h1 em { font-style: italic; color: var(--tomato); }
+
+    .updated {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: var(--mustard); border: 2px solid var(--ink);
+      padding: 5px 14px; border-radius: 100px;
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      color: var(--ink); margin-bottom: 22px;
+      transform: rotate(-1deg);
+      box-shadow: 2px 2px 0 var(--ink);
+      letter-spacing: 1px; text-transform: uppercase;
+    }
+    .updated .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ink); display: block; }
+
+    .hero-sub {
+      font-size: 18px; color: var(--ink-soft);
+      max-width: 480px; line-height: 1.6; margin-bottom: 32px;
+    }
+    .hero-sub b { color: var(--ink); font-weight: 600; }
+    .hero-actions { display: flex; align-items: center; gap: 16px; }
+
+    /* HERO VISUAL — scrapbook card with 5-line summary */
+    .hero-visual { position: relative; height: 480px; }
+    .receipt-card {
+      position: absolute; top: 30px; left: 0; right: 0;
+      background: white;
+      border: 2px solid var(--ink);
+      border-radius: 12px;
+      padding: 24px 28px 26px;
+      box-shadow: 10px 10px 0 var(--olive);
+      transform: rotate(-1.2deg);
+    }
+    .receipt-card::before {
+      content: ''; position: absolute; top: -12px; left: 50%;
+      width: 110px; height: 22px;
+      background: rgba(232,90,60,0.5);
+      transform: translateX(-50%) rotate(-3deg);
+      box-shadow: 0 2px 4px rgba(29,26,20,0.08);
+    }
+    .receipt-head {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--ink-soft); margin-bottom: 12px;
+      display: flex; justify-content: space-between;
+      border-bottom: 1px dashed var(--rule); padding-bottom: 10px;
+    }
+    .receipt-card h3 {
+      font-family: 'Instrument Serif', serif; font-style: italic;
+      font-size: 26px; line-height: 1; margin-bottom: 14px;
+      color: var(--ink);
+    }
+    .receipt-row {
+      display: grid; grid-template-columns: 100px 1fr;
+      gap: 12px; padding: 9px 0;
+      border-bottom: 1px dotted var(--rule);
+      font-size: 14px;
+    }
+    .receipt-row:last-child { border-bottom: none; }
+    .receipt-row .k {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--ink-soft); padding-top: 3px;
+    }
+    .receipt-row .v { color: var(--ink); font-size: 14px; line-height: 1.5; }
+    .receipt-row .v .check { color: var(--olive); margin-right: 6px; font-weight: 700; }
+    .receipt-row .v .x { color: var(--tomato); margin-right: 6px; font-weight: 700; }
+
+    .sticky-note {
+      position: absolute;
+      background: var(--mustard);
+      padding: 14px 16px;
+      font-family: 'Caveat'; font-size: 19px; line-height: 1.2;
+      color: var(--ink);
+      box-shadow: 0 6px 14px rgba(29,26,20,0.15);
+      transform: rotate(-7deg);
+      max-width: 170px;
+      top: -10px; right: -8px;
+      z-index: 4;
+    }
+    .sticky-note::before {
+      content: ''; position: absolute; top: -6px; left: 30%;
+      width: 50px; height: 14px; background: rgba(255,255,255,0.4);
+    }
+
+    /* TICKER */
+    .ticker {
+      background: var(--ink); color: var(--paper);
+      padding: 14px 0; overflow: hidden;
+      border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink);
+      font-family: 'Instrument Serif', serif; font-style: italic;
+      font-size: 28px; position: relative; z-index: 1;
+    }
+    .ticker-track { display: flex; gap: 40px; white-space: nowrap; animation: tickerScroll 35s linear infinite; }
+    .ticker-track > span { display: inline-flex; align-items: center; gap: 40px; }
+    @keyframes tickerScroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+    .ticker-sep { color: var(--mustard); font-style: normal; }
+
+    /* SECTIONS — same shell as ./ */
+    section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+    .sec-eyebrow {
+      font-family: 'Caveat'; font-size: 26px; color: var(--tomato);
+      transform: rotate(-2deg); display: inline-block;
+      margin-bottom: 8px;
+    }
+    h2 {
+      font-family: 'Instrument Serif', serif; font-weight: 400;
+      font-size: clamp(40px, 5vw, 64px);
+      line-height: 1.04; letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    h2 em { color: var(--tomato); font-style: italic; }
+    .sec-desc { font-size: 17px; color: var(--ink-soft); max-width: 560px; line-height: 1.65; }
+    .sec-head { text-align: center; max-width: 720px; margin: 0 auto 56px; }
+    .sec-head .sec-desc { margin: 0 auto; }
+
+    /* PROMISE — single large callout */
+    .promise {
+      position: relative;
+      background: white;
+      border: 2px solid var(--ink);
+      border-radius: 16px;
+      padding: 40px 44px 40px 160px;
+      box-shadow: 10px 10px 0 var(--mustard);
+      transform: rotate(-0.4deg);
+      max-width: 960px; margin: 0 auto;
+    }
+    .promise-seal {
+      position: absolute; top: 50%; left: 28px;
+      transform: translateY(-50%) rotate(-10deg);
+      width: 108px; height: 108px;
+      border: 2.5px dashed var(--olive);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      font-family: 'Caveat', cursive; font-size: 18px; line-height: 1.05;
+      color: var(--olive);
+      background: var(--paper);
+    }
+    .promise-seal::after {
+      content: ''; position: absolute; inset: 5px;
+      border: 1.5px dashed var(--olive); border-radius: 50%;
+      opacity: 0.55;
+    }
+    .promise h3 {
+      font-family: 'Instrument Serif', serif; font-weight: 400;
+      font-size: clamp(28px, 3.2vw, 38px);
+      margin-bottom: 12px; line-height: 1.1; letter-spacing: -0.5px;
+    }
+    .promise h3 em { color: var(--tomato); font-style: italic; }
+    .promise p { font-size: 16px; color: var(--ink-soft); line-height: 1.7; }
+    .promise code {
+      background: var(--paper-2); padding: 2px 7px; border-radius: 4px;
+      font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+      color: var(--ink);
+    }
+
+    /* STORAGE — 4-up step cards (like ./ steps but 4-col → 2x2) */
+    .storage-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr);
+      gap: 28px; margin-top: 8px;
+    }
+    .storage-card {
+      position: relative;
+      padding: 26px 28px 28px;
+      background: white;
+      border: 2px solid var(--ink);
+      border-radius: 16px;
+      box-shadow: 6px 6px 0 var(--ink);
+    }
+    .storage-card:nth-child(1) { transform: rotate(-0.8deg); box-shadow: 6px 6px 0 var(--tomato); }
+    .storage-card:nth-child(2) { transform: rotate(0.5deg); background: var(--paper-2); }
+    .storage-card:nth-child(3) { transform: rotate(0.4deg); box-shadow: 6px 6px 0 var(--mustard); }
+    .storage-card:nth-child(4) { transform: rotate(-0.4deg); background: var(--paper-2); box-shadow: 6px 6px 0 var(--olive); }
+    .storage-card .tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      background: var(--ink); color: var(--paper);
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 5px 12px; border-radius: 100px;
+      margin-bottom: 14px;
+    }
+    .storage-card:nth-child(1) .tag { background: var(--tomato); }
+    .storage-card:nth-child(3) .tag { background: var(--mustard); color: var(--ink); }
+    .storage-card:nth-child(4) .tag { background: var(--olive); }
+    .storage-card h3 {
+      font-family: 'Instrument Serif', serif; font-weight: 400;
+      font-size: 26px; line-height: 1.15; margin-bottom: 10px;
+    }
+    .storage-card p { color: var(--ink-soft); font-size: 15px; line-height: 1.65; }
+    .storage-card p strong { color: var(--ink); font-weight: 600; }
+
+    /* READ LIST — single column receipt-style list */
+    .read-list {
+      max-width: 820px; margin: 0 auto;
+      background: white;
+      border: 2px solid var(--ink); border-radius: 16px;
+      box-shadow: 8px 8px 0 var(--tomato);
+      padding: 28px 36px;
+      transform: rotate(-0.3deg);
+    }
+    .read-head {
+      font-family: 'JetBrains Mono', monospace; font-size: 11px;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--ink-soft);
+      border-bottom: 1px dashed var(--rule);
+      padding-bottom: 12px; margin-bottom: 6px;
+      display: flex; justify-content: space-between;
+    }
+    .read-row {
+      display: grid; grid-template-columns: 26px 1fr auto;
+      gap: 16px; align-items: baseline;
+      padding: 16px 0; border-bottom: 1px dashed var(--rule);
+    }
+    .read-row:last-of-type { border-bottom: none; }
+    .read-check {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--olive); color: white;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      border: 2px solid var(--ink);
+    }
+    .read-main {
+      font-family: 'Instrument Serif', serif; font-size: 22px; line-height: 1.2;
+    }
+    .read-main .sub {
+      display: block; font-family: 'DM Sans', sans-serif;
+      font-size: 14px; color: var(--ink-soft); margin-top: 4px;
+      line-height: 1.55;
+    }
+    .read-when {
+      font-family: 'Caveat', cursive; font-size: 19px;
+      color: var(--tomato); white-space: nowrap;
+    }
+    .read-foot {
+      margin-top: 14px; padding-top: 12px;
+      border-top: 2px dashed var(--ink);
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--ink-soft);
+      display: flex; justify-content: space-between;
+    }
+
+    /* LEDGER — permissions table */
+    .ledger {
+      max-width: 960px; margin: 0 auto;
+      background: white;
+      border: 2px solid var(--ink); border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 10px 10px 0 var(--olive);
+    }
+    .ledger-row {
+      display: grid; grid-template-columns: 230px 1fr;
+      border-bottom: 1px dashed var(--rule);
+    }
+    .ledger-row:last-child { border-bottom: none; }
+    .ledger-row.head { background: var(--paper-2); border-bottom: 2px solid var(--ink); }
+    .ledger-row.head .cell {
+      font-family: 'JetBrains Mono', monospace; font-size: 10px;
+      letter-spacing: 2px; text-transform: uppercase;
+      color: var(--ink-soft); font-weight: 600;
+    }
+    .ledger-row .cell { padding: 18px 24px; font-size: 14px; color: var(--ink-soft); line-height: 1.6; }
+    .ledger-row .cell.k { border-right: 1px dashed var(--rule); background: rgba(232,90,60,0.04); }
+    .perm-chip {
+      display: inline-block;
+      background: var(--ink); color: var(--paper);
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      padding: 4px 11px; border-radius: 6px;
+    }
+    .ledger-row .cell strong { color: var(--ink); font-weight: 600; }
+
+    /* NEVER COLLECTED — crossed grid */
+    .never-grid {
+      max-width: 1000px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px;
+    }
+    .never-item {
+      position: relative;
+      background: var(--paper-2);
+      border: 2px solid var(--ink);
+      border-radius: 12px;
+      padding: 16px 22px 16px 60px;
+      font-size: 16px; color: var(--ink);
+      font-family: 'Instrument Serif', serif;
+      line-height: 1.3;
+    }
+    .never-item:nth-child(2n) { transform: rotate(0.5deg); }
+    .never-item:nth-child(2n+1) { transform: rotate(-0.5deg); }
+    .never-item::before {
+      content: '✕'; position: absolute; top: 50%; left: 18px;
+      transform: translateY(-50%);
+      width: 26px; height: 26px;
+      background: var(--tomato); color: white;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700;
+      font-family: 'DM Sans', sans-serif;
+    }
+    /* strikethrough line removed per user request */
+
+    /* SIGN-OFF LETTER */
+    .signoff {
+      max-width: 820px; margin: 0 auto;
+      background: white;
+      border: 2px solid var(--ink);
+      border-radius: 16px;
+      padding: 44px 52px;
+      box-shadow: 10px 10px 0 var(--ink);
+      transform: rotate(-0.3deg);
+      position: relative;
+    }
+    .signoff::before {
+      content: ''; position: absolute; top: -12px; left: 44px;
+      width: 100px; height: 24px;
+      background: rgba(226,169,58,0.6);
+      transform: rotate(-3deg);
+      box-shadow: 0 2px 4px rgba(29,26,20,0.08);
+    }
+    .signoff .salutation {
+      font-family: 'Instrument Serif', serif; font-style: italic;
+      font-size: 30px; margin-bottom: 18px;
+    }
+    .signoff p {
+      font-size: 16px; color: var(--ink-soft); line-height: 1.7;
+      margin-bottom: 14px;
+    }
+    .signoff p a {
+      color: var(--tomato); text-decoration: underline;
+      text-decoration-style: wavy; text-underline-offset: 4px;
+    }
+    .signoff .sign {
+      margin-top: 24px;
+      font-family: 'Caveat', cursive; font-size: 28px;
+      color: var(--ink);
+    }
+    .signoff .sign small {
+      display: block; font-family: 'JetBrains Mono', monospace;
+      font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--ink-soft); margin-top: 6px;
+    }
+
+    .back-cta {
+      max-width: 820px; margin: 36px auto 0;
+      text-align: center;
+    }
+
+    /* FOOTER */
+    footer {
+      padding: 36px 40px;
+      border-top: 1px dashed var(--rule);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; color: var(--ink-soft);
+      max-width: 1200px; margin: 0 auto;
+      position: relative; z-index: 1;
+    }
+    footer .signature { font-family: 'Caveat'; font-size: 22px; color: var(--ink); }
+    footer a { color: var(--ink-soft); text-decoration: none; }
+
+    @media (max-width: 880px) {
+      nav { padding: 14px 20px; }
+      .nav-links { display: none; }
+      .hero { grid-template-columns: 1fr; padding: 32px 24px 40px; gap: 36px; }
+      .hero-visual { height: 380px; }
+      section { padding: 60px 24px; }
+      .storage-grid, .never-grid { grid-template-columns: 1fr; }
+      .ledger-row { grid-template-columns: 1fr; }
+      .ledger-row .cell.k { border-right: none; border-bottom: 1px dashed var(--rule); }
+      .promise { padding: 28px 24px 28px 120px; }
+      .promise-seal { width: 84px; height: 84px; font-size: 14px; left: 16px; }
+      .read-row { grid-template-columns: 24px 1fr; }
+      .read-when { grid-column: 2; margin-top: 4px; }
+      .signoff { padding: 32px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="./" class="nav-logo">
+    <span class="mark"><i>AI&nbsp;Weaver</i></span>
+    <span class="sub">est. 2026</span>
+  </a>
+  <div class="nav-links">
+    <a href="./#how">How it works</a>
+    <a href="./#features">Features</a>
+    <a href="./#splitview">Split view</a>
+    <a href="privacy.html" class="active">Privacy</a>
+  </div>
+  <a href="./" class="btn ghost" style="border: 2px solid var(--ink);">
+    <svg viewBox="0 0 16 16" width="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4l-4 4 4 4"/></svg>
+    Back to home
+  </a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="hero-eyebrow">
+      <a href="./">← back to AI Weaver</a>
+    </div>
+    <div class="updated"><span class="dot"></span>Last updated · April 24, 2026</div>
+    <h1>Your data<br/>stays <em>with you.</em></h1>
+    <p class="hero-sub">
+      AI Weaver is built on a simple principle: <b>your browsing context is yours.</b> We don't collect it, store it on servers, or share it with anyone. Here's exactly what happens &mdash; and what doesn't.
+    </p>
+    <div class="hero-actions">
+      <a href="#promise" class="btn tomato">
+        Read the promise
+        <svg viewBox="0 0 16 16" width="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3v10M3 8l5 5 5-5"/></svg>
+      </a>
+      <a href="#contact" class="btn ghost">Ask a question</a>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <div class="receipt-card">
+      <div class="receipt-head">
+        <span>The five-line summary</span>
+        <span>file №02</span>
+      </div>
+      <h3>The short version.</h3>
+      <div class="receipt-row"><div class="k">Servers</div><div class="v"><span class="x">✕</span> Zero. None. Nothing phones home.</div></div>
+      <div class="receipt-row"><div class="k">Tracking</div><div class="v"><span class="x">✕</span> No analytics, telemetry, or SDKs.</div></div>
+      <div class="receipt-row"><div class="k">Stored</div><div class="v"><span class="check">✓</span> Locally on your device, that's it.</div></div>
+      <div class="receipt-row"><div class="k">Sent</div><div class="v"><span class="check">✓</span> Only to the AI you chose, when you click.</div></div>
+    </div>
+    <div class="sticky-note">
+      everything<br/>stays in<br/><u>your browser.</u>
+    </div>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span>
+      No servers. <span class="ticker-sep">✦</span>
+      No tracking. <span class="ticker-sep">✦</span>
+      No telemetry. <span class="ticker-sep">✦</span>
+      No third parties. <span class="ticker-sep">✦</span>
+      No surprises. <span class="ticker-sep">✦</span>
+      Your data stays with you. <span class="ticker-sep">✦</span>
+      No servers. <span class="ticker-sep">✦</span>
+      No tracking. <span class="ticker-sep">✦</span>
+      No telemetry. <span class="ticker-sep">✦</span>
+      No third parties. <span class="ticker-sep">✦</span>
+      No surprises. <span class="ticker-sep">✦</span>
+      Your data stays with you. <span class="ticker-sep">✦</span>
+    </span>
+    <span>
+      No servers. <span class="ticker-sep">✦</span>
+      No tracking. <span class="ticker-sep">✦</span>
+      No telemetry. <span class="ticker-sep">✦</span>
+      No third parties. <span class="ticker-sep">✦</span>
+      No surprises. <span class="ticker-sep">✦</span>
+      Your data stays with you. <span class="ticker-sep">✦</span>
+      No servers. <span class="ticker-sep">✦</span>
+      No tracking. <span class="ticker-sep">✦</span>
+      No telemetry. <span class="ticker-sep">✦</span>
+      No third parties. <span class="ticker-sep">✦</span>
+      No surprises. <span class="ticker-sep">✦</span>
+      Your data stays with you. <span class="ticker-sep">✦</span>
+    </span>
+  </div>
+</div>
+
+<!-- PROMISE -->
+<section id="promise">
+  <div class="sec-head">
+    <span class="sec-eyebrow">the promise</span>
+    <h2>Zero <em>external servers.</em></h2>
+    <p class="sec-desc">The plainest possible answer to "what does this extension talk to?" — almost nothing.</p>
+  </div>
+
+  <div class="promise">
+    <div class="promise-seal">our solemn<br/>vow.</div>
+    <h3>AI Weaver makes <em>no network requests</em> of its own.</h3>
+    <p>There are zero <code>fetch</code>, XHR, or WebSocket calls to any external server. No analytics. No telemetry. No error reporting. No third-party SDKs. The only network traffic is between your browser and the AI platforms <em>you</em> already use &mdash; and that traffic only happens when you press send.</p>
+  </div>
+</section>
+
+<!-- STORAGE -->
+<section>
+  <div class="sec-head">
+    <span class="sec-eyebrow">where things live</span>
+    <h2>What's <em>stored</em> &mdash; and where.</h2>
+    <p class="sec-desc">Everything AI Weaver stores is on your device, under your control. Nothing leaves your browser unless you explicitly send it.</p>
+  </div>
+
+  <div class="storage-grid">
+    <div class="storage-card">
+      <span class="tag">Chrome Sync</span>
+      <h3>Group &amp; chat metadata.</h3>
+      <p>Names, URLs, preferences, prompt templates. Synced across <strong>your own</strong> Chrome devices via your Google account. Never seen by us.</p>
+    </div>
+    <div class="storage-card">
+      <span class="tag">Session Storage</span>
+      <h3>Gone when you close the tab.</h3>
+      <p>Screenshots (PNG), pending thread queue, recent chat history per platform. <strong>Cleared the moment the tab closes.</strong> Never persisted off-device.</p>
+    </div>
+    <div class="storage-card">
+      <span class="tag">localStorage</span>
+      <h3>Backup snapshots of groups.</h3>
+      <p>On-device only, auto-managed. Used to recover from a bad sync. <strong>Never transmitted</strong> anywhere, by anyone.</p>
+    </div>
+    <div class="storage-card">
+      <span class="tag">One cookie</span>
+      <h3>Anthropic opt-out preference.</h3>
+      <p>We set <strong>anthropic-consent-preferences</strong> on claude.ai to opt you out of their analytics. <strong>Write-only.</strong> We never read it back.</p>
+    </div>
+  </div>
+</section>
+
+<!-- WHAT WE READ -->
+<section>
+  <div class="sec-head">
+    <span class="sec-eyebrow">page access</span>
+    <h2>What we <em>read</em> from pages.</h2>
+    <p class="sec-desc">AI Weaver only reads what you explicitly trigger. Nothing is collected passively. Here's the receipt:</p>
+  </div>
+
+  <div class="read-list">
+    <div class="read-head">
+      <span>Receipt №02 — what's read, and when</span>
+      <span>only on user action</span>
+    </div>
+    <div class="read-row">
+      <div class="read-check">✓</div>
+      <div class="read-main">Selected text
+        <span class="sub">Only when you highlight it and choose to send.</span>
+      </div>
+      <div class="read-when">when you click</div>
+    </div>
+    <div class="read-row">
+      <div class="read-check">✓</div>
+      <div class="read-main">Chat URL / ID
+        <span class="sub">From <code style="font-family:'JetBrains Mono';font-size:12px;background:var(--paper-2);padding:1px 5px;border-radius:3px;">window.location</code> &mdash; for thread labeling, not chat content.</span>
+      </div>
+      <div class="read-when">on open</div>
+    </div>
+    <div class="read-row">
+      <div class="read-check">✓</div>
+      <div class="read-main">Page title
+        <span class="sub">Used for labeling groups and threads in your sidebar.</span>
+      </div>
+      <div class="read-when">on send</div>
+    </div>
+    <div class="read-row">
+      <div class="read-check">✓</div>
+      <div class="read-main">Visible tab screenshot
+        <span class="sub">Only when you trigger capture. Never sent anywhere automatically.</span>
+      </div>
+      <div class="read-when">on capture</div>
+    </div>
+    <div class="read-foot">
+      <span>Total · 4 items · all user-initiated</span>
+      <span>signed, AI Weaver</span>
+    </div>
+  </div>
+</section>
+
+<!-- PERMISSIONS -->
+<section>
+  <div class="sec-head">
+    <span class="sec-eyebrow">the ledger</span>
+    <h2>Why each <em>permission</em> exists.</h2>
+    <p class="sec-desc">Chrome makes us declare permissions upfront. Here's exactly what each one does &mdash; and absolutely nothing more.</p>
+  </div>
+
+  <div class="ledger">
+    <div class="ledger-row head">
+      <div class="cell k">Permission</div>
+      <div class="cell">Why it's needed</div>
+    </div>
+    <div class="ledger-row">
+      <div class="cell k"><span class="perm-chip">tabs</span></div>
+      <div class="cell">Open background tabs for thread creation when you send context to a new AI chat.</div>
+    </div>
+    <div class="ledger-row">
+      <div class="cell k"><span class="perm-chip">cookies</span></div>
+      <div class="cell">Set the Claude analytics opt-out cookie on claude.ai on your behalf.</div>
+    </div>
+    <div class="ledger-row">
+      <div class="cell k"><span class="perm-chip">declarativeNetRequest</span></div>
+      <div class="cell">Strip X-Frame-Options / CSP framing headers so the side panel iframes can load AI platforms inline.</div>
+    </div>
+    <div class="ledger-row">
+      <div class="cell k"><span class="perm-chip">clipboardWrite</span></div>
+      <div class="cell">Copy group export data to your clipboard. <strong>Write-only</strong> &mdash; never reads from clipboard.</div>
+    </div>
+    <div class="ledger-row">
+      <div class="cell k"><span class="perm-chip">&lt;all_urls&gt;</span></div>
+      <div class="cell">Enable the toolbar and thread creation on any page you visit &mdash; required for a universal browser extension.</div>
+    </div>
+  </div>
+</section>
+
+<!-- NEVER COLLECTED -->
+<section>
+  <div class="sec-head">
+    <span class="sec-eyebrow">the blank page</span>
+    <h2>What we <em>never</em> touch.</h2>
+    <p class="sec-desc">A short list of things AI Weaver doesn't collect, doesn't see, and couldn't ship anywhere even if it wanted to.</p>
+  </div>
+
+  <div class="never-grid">
+    <div class="never-item">Chat message content or AI responses</div>
+    <div class="never-item">Login credentials or session tokens</div>
+    <div class="never-item">Browser history outside AI platforms</div>
+    <div class="never-item">Any personally identifiable information</div>
+    <div class="never-item">Analytics or usage telemetry of any kind</div>
+    <div class="never-item">Third-party SDKs or tracking scripts</div>
+  </div>
+</section>
+
+<!-- SIGN OFF -->
+<section id="contact" style="padding-top: 40px;">
+  <div class="signoff">
+    <div class="salutation">A quick word, then.</div>
+    <p>If anything here is unclear, or you'd like to understand more about how AI Weaver handles your data &mdash; reach out. We're happy to explain in plain language, no legalese required.</p>
+    <p><a href="/cdn-cgi/l/email-protection#cba3aea7a7a48baaa2bcaeaabdaeb9e5aabbbb"><span class="__cf_email__" data-cfemail="abc3cec7c7c4ebcac2dccecaddced985cadbdb">[email&#160;protected]</span></a></p>
+    <div class="sign">
+      &mdash; the AI Weaver team
+      <small>this notice has been on the page since day one</small>
+    </div>
+  </div>
+  <div class="back-cta">
+    <a href="./" class="btn tomato">
+      <svg viewBox="0 0 16 16" width="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 4l-4 4 4 4"/></svg>
+      Back to AI Weaver
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="signature">— AI Weaver, est. 2026</div>
+  <div>© 2026, made with too much coffee</div>
+  <div style="display:flex;gap:20px;">
+    <a href="privacy.html">Privacy</a>
+    <a href="#">Terms</a>
+  </div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script></body>
+</html>

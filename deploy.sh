@@ -18,19 +18,12 @@ done
 
 echo "→ Fixing image paths..."
 
-declare -A IMG_MAP=(
-  ["assets/real-add-tools.png"]="screenshot/ai-weaver-add-tools-menu-small.png"
-  ["assets/real-toolbar-capture.png"]="screenshot/ai-weaver-toolbar-capture-portion.png"
-  ["assets/real-berlin-page.png"]="screenshot/berlin-events-page-modal.png"
-  ["assets/real-toolbar-models.png"]="screenshot/ai-weaver-toolbar-model-selector.png"
-  ["assets/real-gemini-events.png"]="screenshot/ai-weaver-gemini-event-recommendations.png"
-)
-
 for f in *.html; do
-  for key in "${!IMG_MAP[@]}"; do
-    val="${IMG_MAP[$key]}"
-    sed -i '' "s|src=\"${key}\"|src=\"${val}\"|g" "$f"
-  done
+  sed -i '' 's|src="assets/real-add-tools\.png"|src="screenshot/ai-weaver-add-tools-menu-small.png"|g' "$f"
+  sed -i '' 's|src="assets/real-toolbar-capture\.png"|src="screenshot/ai-weaver-toolbar-capture-portion.png"|g' "$f"
+  sed -i '' 's|src="assets/real-berlin-page\.png"|src="screenshot/berlin-events-page-modal.png"|g' "$f"
+  sed -i '' 's|src="assets/real-toolbar-models\.png"|src="screenshot/ai-weaver-toolbar-model-selector.png"|g' "$f"
+  sed -i '' 's|src="assets/real-gemini-events\.png"|src="screenshot/ai-weaver-gemini-event-recommendations.png"|g' "$f"
 done
 
 echo "→ Staging and pushing..."

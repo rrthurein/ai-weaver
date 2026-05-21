@@ -324,9 +324,20 @@
     .feature-img-wrap.tilt-r img { transform: rotate(1.5deg); }
     .feature-img-wrap .annot {
       position: absolute;
-      font-family: 'Caveat'; font-size: 22px;
-      color: var(--tomato); transform: rotate(-4deg);
-      max-width: 160px; line-height: 1.15;
+      font-family: 'Caveat'; font-size: 22px; font-weight: 600;
+      color: var(--ink);
+      background: var(--mustard);
+      padding: 4px 14px;
+      border: 2px solid var(--ink);
+      border-radius: 100px;
+      box-shadow: 3px 3px 0 var(--ink);
+      transform: rotate(-3deg);
+      max-width: 220px;
+      line-height: 1.15;
+      white-space: nowrap;
+    }
+    .feature-img-wrap.tilt-l .annot {
+      background: var(--tomato); color: white;
     }
     .annot-arrow {
       position: absolute; pointer-events: none;
@@ -435,7 +446,7 @@
     .pill-bar { padding: 10px; display: flex; justify-content: center; background: var(--paper-2); border-top: 1px dashed var(--rule); }
 
     /* SPLITVIEW — real screenshot */
-    .splitview-wrap { position: relative; margin-top: 48px; padding-bottom: 50px; }
+    .splitview-wrap { position: relative; margin-top: 48px; padding-bottom: 80px; }
     .sv-real-shot {
       background: white; padding: 18px;
       position: relative;
@@ -734,7 +745,12 @@
       <h3>Spot something interesting on a page.</h3>
       <p>An article, a chart, a sentence in a research paper, a confusing error in a doc — anything you'd normally copy.</p>
       <svg class="step-arrow" width="56" height="40" viewBox="0 0 56 40" fill="none">
-        <path d="M2 20 Q 28 6 50 20 L 44 14 M 50 20 L 44 26" stroke="#1d1a14" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <defs>
+          <marker id="arrow1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0 0 L10 5 L0 10" fill="none" stroke="#e85a3c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <path d="M2 20 Q 28 6 48 20" stroke="#e85a3c" stroke-width="2" stroke-linecap="round" fill="none" marker-end="url(#arrow1)"/>
       </svg>
     </div>
     <div class="step">
@@ -742,7 +758,12 @@
       <h3>Highlight it, or snip a screenshot.</h3>
       <p>Drag-select text the way you always have. Or click the camera in the toolbar and box around what you want.</p>
       <svg class="step-arrow" width="56" height="40" viewBox="0 0 56 40" fill="none">
-        <path d="M2 20 Q 28 34 50 20 L 44 14 M 50 20 L 44 26" stroke="#1d1a14" stroke-width="2" stroke-linecap="round" fill="none"/>
+        <defs>
+          <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0 0 L10 5 L0 10" fill="none" stroke="#e85a3c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <path d="M2 20 Q 28 34 48 20" stroke="#e85a3c" stroke-width="2" stroke-linecap="round" fill="none" marker-end="url(#arrow2)"/>
       </svg>
     </div>
     <div class="step">
@@ -768,10 +789,7 @@
     </div>
     <div class="feature-img-wrap tilt-r">
       <img src="screenshot/berlin-events-page-modal.png" alt="Capture in action — dragging a region on a Berlin events page" />
-      <div class="annot" style="top: -10px; right: 10px;">drag &amp; ship &rarr;</div>
-      <svg class="annot-arrow" style="top: 22px; right: 12%;" width="60" height="80" viewBox="0 0 60 80" fill="none">
-        <path d="M50 5 Q 30 30 15 65 L 22 58 M 15 65 L 22 70" stroke="#e85a3c" stroke-width="2" stroke-linecap="round" fill="none"/>
-      </svg>
+      <div class="annot" style="top: -10px; right: 10px;">select any region</div>
     </div>
   </div>
 </section>
@@ -791,7 +809,7 @@
     </div>
     <div class="feature-img-wrap tilt-l">
       <img src="screenshot/ai-weaver-toolbar-model-selector.png" alt="Toolbar showing model selector with Gemini, Claude, ChatGPT, Perplexity" />
-      <div class="annot" style="bottom: -10px; left: 20px; transform: rotate(3deg);">&larr; pick your AI</div>
+      <div class="annot" style="bottom: -10px; left: 20px; transform: rotate(3deg);">pick your AI</div>
     </div>
   </div>
 </section>

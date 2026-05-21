@@ -3,8 +3,10 @@ set -e
 
 echo "→ Fixing links..."
 
-# final.html → ./ (but not privacy-final.html, handle that separately)
+# final.html / final-real.html → ./ (but not privacy-final.html, handle that separately)
 for f in *.html; do
+  sed -i '' 's|href="final-real\.html#|href="./#|g' "$f"
+  sed -i '' 's|href="final-real\.html"|href="./"|g' "$f"
   sed -i '' 's|href="final\.html#|href="./#|g' "$f"
   sed -i '' 's|href="final\.html"|href="./"|g' "$f"
 done

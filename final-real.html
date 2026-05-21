@@ -1,0 +1,1018 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Weaver — A friendlier way to talk to your AI</title>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Caveat:wght@400;600;700&family=DM+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --paper: #faf6ee;
+      --paper-2: #f3ecdc;
+      --ink: #1d1a14;
+      --ink-soft: #5a5346;
+      --rule: #e3dccc;
+      --tomato: #e85a3c;
+      --tomato-soft: #fbd9cf;
+      --olive: #6b7a3a;
+      --mustard: #e2a93a;
+      --sky: #4f8fd4;
+      --plum: #8a5a9b;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'DM Sans', sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(232,90,60,0.06), transparent 50%),
+        radial-gradient(ellipse at 90% 80%, rgba(226,169,58,0.05), transparent 50%);
+    }
+
+    /* paper texture */
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 1px 1px, rgba(29,26,20,0.04) 1px, transparent 0);
+      background-size: 22px 22px;
+      z-index: 0;
+    }
+
+    .serif { font-family: 'Instrument Serif', serif; font-weight: 400; }
+    .hand { font-family: 'Caveat', cursive; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+
+    /* NAV */
+    nav {
+      position: sticky; top: 0; z-index: 50;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 18px 40px;
+      background: rgba(250,246,238,0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px dashed var(--rule);
+    }
+    .nav-logo {
+      display: flex; align-items: baseline; gap: 6px;
+      text-decoration: none; color: var(--ink);
+    }
+    .nav-logo .mark {
+      font-family: 'Instrument Serif', serif;
+      font-size: 28px; line-height: 1;
+      font-style: italic;
+    }
+    .nav-logo .mark::after {
+      content: '.'; color: var(--tomato);
+    }
+    .nav-logo .sub { font-family: 'Caveat'; font-size: 18px; color: var(--ink-soft); transform: rotate(-3deg); display: inline-block; }
+    .nav-links { display: flex; gap: 30px; }
+    .nav-links a {
+      color: var(--ink-soft); text-decoration: none; font-size: 14px;
+      position: relative;
+    }
+    .nav-links a:hover { color: var(--tomato); }
+    .nav-links a:hover::after {
+      content: ''; position: absolute; left: -2px; right: -2px; bottom: -3px;
+      height: 6px; background: var(--tomato);
+      mask: radial-gradient(circle at 50% 0, transparent 4px, black 5px);
+      opacity: 0.4;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 22px;
+      background: var(--ink); color: var(--paper);
+      border-radius: 100px;
+      text-decoration: none; font-weight: 500; font-size: 14px;
+      border: 2px solid var(--ink);
+      box-shadow: 3px 3px 0 var(--tomato);
+      transition: transform 0.12s, box-shadow 0.12s;
+    }
+    .btn:hover { transform: translate(-1px, -1px); box-shadow: 4px 4px 0 var(--tomato); }
+    .btn.tomato { background: var(--tomato); border-color: var(--tomato); box-shadow: 3px 3px 0 var(--ink); }
+    .btn.tomato:hover { box-shadow: 4px 4px 0 var(--ink); }
+    .btn.ghost { background: transparent; color: var(--ink); box-shadow: none; }
+    .btn.ghost:hover { background: var(--paper-2); transform: none; box-shadow: none; }
+
+    /* HERO */
+    .hero {
+      max-width: 1200px; margin: 0 auto;
+      padding: 72px 40px 80px;
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1.1fr 0.9fr;
+      gap: 60px; align-items: center;
+    }
+    .hero-eyebrow {
+      display: inline-flex; align-items: center; gap: 10px;
+      font-family: 'Caveat'; font-size: 22px; color: var(--tomato);
+      transform: rotate(-2deg); margin-bottom: 18px;
+    }
+    .hero-eyebrow svg { transform: rotate(-12deg); }
+    h1 {
+      font-family: 'Instrument Serif', serif;
+      font-weight: 400;
+      font-size: clamp(54px, 7vw, 96px);
+      line-height: 0.98;
+      letter-spacing: -1.5px;
+      color: var(--ink);
+      margin-bottom: 28px;
+    }
+    h1 .underline-doodle {
+      position: relative; display: inline-block;
+    }
+    h1 .underline-doodle::after {
+      content: ''; position: absolute;
+      left: -4px; right: -4px; bottom: -2px; height: 14px;
+      background: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 14' preserveAspectRatio='none'><path d='M2 8 Q 50 2 100 7 T 198 6' stroke='%23e85a3c' stroke-width='3' fill='none' stroke-linecap='round'/></svg>") no-repeat center / 100% 100%;
+    }
+    h1 em {
+      font-style: italic;
+      color: var(--tomato);
+    }
+    h1 .strike {
+      position: relative; color: var(--ink-soft);
+      display: inline-block;
+    }
+    h1 .strike::after {
+      content: ''; position: absolute;
+      left: -3px; right: -3px; top: 58%; height: 4px;
+      background: var(--ink);
+      transform: rotate(-2deg);
+      border-radius: 2px;
+    }
+    .hero-sub {
+      font-size: 18px; color: var(--ink-soft);
+      max-width: 460px; line-height: 1.6;
+      margin-bottom: 32px;
+    }
+    .hero-sub b { color: var(--ink); font-weight: 600; }
+    .hero-actions { display: flex; align-items: center; gap: 16px; margin-bottom: 36px; }
+    .hero-meta { display: flex; align-items: center; gap: 14px; font-size: 13px; color: var(--ink-soft); }
+    .hero-meta .star { color: var(--mustard); }
+
+    /* hero visual: stacked polaroid-ish cards */
+    .hero-visual { position: relative; height: 520px; }
+    .polaroid {
+      position: absolute;
+      background: white;
+      padding: 14px 14px 44px;
+      box-shadow: 0 8px 22px rgba(29,26,20,0.12), 0 1px 0 rgba(29,26,20,0.06);
+      border-radius: 4px;
+    }
+    .polaroid img {
+      display: block; width: 100%;
+      border-radius: 2px;
+      filter: saturate(0.92);
+    }
+    .polaroid .caption {
+      font-family: 'Caveat'; font-size: 20px;
+      text-align: center; margin-top: 10px;
+      color: var(--ink);
+    }
+    .polaroid .tape {
+      position: absolute; top: -10px;
+      width: 80px; height: 22px;
+      background: rgba(226,169,58,0.55);
+      box-shadow: 0 2px 4px rgba(29,26,20,0.08);
+    }
+    .polaroid.p1 {
+      top: 20px; left: 8%; width: 72%;
+      transform: rotate(-3deg);
+      z-index: 2;
+    }
+    .polaroid.p1 .tape { left: 50%; transform: translateX(-50%) rotate(-2deg); }
+    .polaroid.p2 {
+      top: 220px; right: 0; width: 64%;
+      transform: rotate(4deg);
+      z-index: 3;
+    }
+    .polaroid.p2 .tape { left: 30%; transform: rotate(8deg); background: rgba(232,90,60,0.45); }
+    .sticky-note {
+      position: absolute;
+      background: var(--mustard);
+      padding: 14px 16px;
+      font-family: 'Caveat'; font-size: 19px; line-height: 1.25;
+      color: var(--ink);
+      box-shadow: 0 6px 14px rgba(29,26,20,0.15);
+      transform: rotate(-6deg);
+      max-width: 180px;
+    }
+    .sticky-note.s1 { top: 0; right: 4%; z-index: 4; }
+    .sticky-note.s1::before {
+      content: ''; position: absolute; top: -6px; left: 30%;
+      width: 50px; height: 14px; background: rgba(255,255,255,0.4);
+    }
+    .doodle-arrow {
+      position: absolute; pointer-events: none;
+    }
+
+    /* FLOATING DOODLES on whole page */
+    .doodle {
+      position: absolute; pointer-events: none; z-index: 0;
+    }
+
+    /* TICKER STRIP */
+    .ticker {
+      background: var(--ink); color: var(--paper);
+      padding: 14px 0; overflow: hidden;
+      border-top: 2px solid var(--ink); border-bottom: 2px solid var(--ink);
+      font-family: 'Instrument Serif', serif; font-style: italic;
+      font-size: 28px;
+      position: relative; z-index: 1;
+    }
+    .ticker-track {
+      display: flex; gap: 40px; white-space: nowrap;
+      animation: tickerScroll 30s linear infinite;
+    }
+    .ticker-track span { display: inline-flex; align-items: center; gap: 40px; }
+    .ticker-track svg { flex-shrink: 0; }
+    @keyframes tickerScroll {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* SECTIONS */
+    section { padding: 100px 40px; max-width: 1200px; margin: 0 auto; position: relative; z-index: 1; }
+
+    .sec-eyebrow {
+      font-family: 'Caveat'; font-size: 26px; color: var(--tomato);
+      transform: rotate(-2deg); display: inline-block;
+      margin-bottom: 8px;
+    }
+    h2 {
+      font-family: 'Instrument Serif', serif;
+      font-weight: 400;
+      font-size: clamp(40px, 5vw, 64px);
+      line-height: 1.04;
+      letter-spacing: -1px;
+      margin-bottom: 16px;
+    }
+    h2 em { color: var(--tomato); font-style: italic; }
+    .sec-desc { font-size: 17px; color: var(--ink-soft); max-width: 480px; line-height: 1.65; }
+
+    /* THREE-COLUMN HOW-IT-WORKS */
+    .steps {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 32px; margin-top: 56px;
+    }
+    .step {
+      position: relative;
+      padding: 28px 26px 32px;
+      background: white;
+      border: 2px solid var(--ink);
+      border-radius: 16px;
+      box-shadow: 6px 6px 0 var(--ink);
+    }
+    .step:nth-child(1) { transform: rotate(-1.2deg); background: white; box-shadow: 6px 6px 0 var(--tomato); }
+    .step:nth-child(2) { transform: rotate(0.5deg); background: var(--paper-2); }
+    .step:nth-child(3) { transform: rotate(-0.4deg); background: white; box-shadow: 6px 6px 0 var(--mustard); }
+    .step-num {
+      font-family: 'Instrument Serif', serif; font-style: italic;
+      font-size: 56px; line-height: 1;
+      color: var(--tomato);
+      margin-bottom: 8px;
+    }
+    .step h3 {
+      font-family: 'Instrument Serif', serif;
+      font-weight: 400; font-size: 26px;
+      line-height: 1.15; margin-bottom: 10px;
+    }
+    .step p { color: var(--ink-soft); font-size: 15px; line-height: 1.6; }
+    .step-arrow {
+      position: absolute; top: 50%; right: -28px;
+      transform: translateY(-50%);
+      z-index: 2;
+    }
+    .step:last-child .step-arrow { display: none; }
+
+    /* FEATURE — capture */
+    .feature {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 80px; align-items: center;
+      padding-top: 60px; padding-bottom: 60px;
+    }
+    .feature.reverse > :first-child { order: 2; }
+    .feature ul {
+      list-style: none; margin-top: 24px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .feature ul li {
+      display: flex; align-items: flex-start; gap: 12px;
+      font-size: 15px; color: var(--ink);
+    }
+    .feature ul li svg { flex-shrink: 0; margin-top: 2px; }
+    .feature-img-wrap {
+      position: relative;
+      padding: 18px;
+    }
+    .feature-img-wrap img {
+      display: block; width: 100%;
+      border-radius: 10px;
+      box-shadow: 0 16px 40px rgba(29,26,20,0.18), 0 0 0 1px rgba(29,26,20,0.08);
+      border: 8px solid white;
+    }
+    .feature-img-wrap.tilt-l img { transform: rotate(-1.5deg); }
+    .feature-img-wrap.tilt-r img { transform: rotate(1.5deg); }
+    .feature-img-wrap .annot {
+      position: absolute;
+      font-family: 'Caveat'; font-size: 22px; font-weight: 600;
+      color: var(--ink);
+      background: var(--mustard);
+      padding: 4px 14px;
+      border: 2px solid var(--ink);
+      border-radius: 100px;
+      box-shadow: 3px 3px 0 var(--ink);
+      transform: rotate(-3deg);
+      max-width: 220px;
+      line-height: 1.15;
+      white-space: nowrap;
+    }
+    .feature-img-wrap.tilt-l .annot {
+      background: var(--tomato); color: white;
+    }
+    .annot-arrow {
+      position: absolute; pointer-events: none;
+    }
+
+    /* TWO-UP DEMO ROW (live mini-mocks like v1) */
+    .demo-row {
+      display: grid; grid-template-columns: 1fr 1fr;
+      gap: 36px; margin-top: 56px;
+    }
+    .demo-card {
+      background: white;
+      border: 2px solid var(--ink);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 8px 8px 0 var(--ink);
+      position: relative;
+    }
+    .demo-card:nth-child(1) { transform: rotate(-0.6deg); box-shadow: 8px 8px 0 var(--tomato); }
+    .demo-card:nth-child(2) { transform: rotate(0.6deg); box-shadow: 8px 8px 0 var(--olive); }
+    .demo-head {
+      padding: 18px 22px 12px;
+      border-bottom: 1px dashed var(--rule);
+    }
+    .demo-head .tag { font-family: 'Caveat'; font-size: 22px; color: var(--tomato); }
+    .demo-head h3 {
+      font-family: 'Instrument Serif', serif; font-weight: 400;
+      font-size: 28px; line-height: 1.1;
+    }
+    .demo-stage {
+      background: var(--paper-2);
+      padding: 18px;
+      min-height: 280px;
+      position: relative;
+    }
+    .demo-stage .browser-mock {
+      background: white; border-radius: 8px;
+      border: 1px solid var(--rule);
+      overflow: hidden; height: 100%;
+      position: relative;
+    }
+    .browser-mock .bm-bar {
+      padding: 8px 12px; border-bottom: 1px solid var(--rule);
+      display: flex; align-items: center; gap: 8px;
+      background: #f6f1e3;
+    }
+    .bm-dot { width: 9px; height: 9px; border-radius: 50%; background: #d4ccba; }
+    .bm-url {
+      flex: 1; background: white; border-radius: 4px;
+      padding: 3px 10px; font-size: 11px; color: var(--ink-soft);
+      font-family: 'JetBrains Mono', monospace;
+      border: 1px solid var(--rule);
+    }
+    .bm-body { padding: 18px 20px; position: relative; min-height: 220px; }
+    .bm-eyebrow { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--ink-soft); margin-bottom: 10px; }
+    .bm-h { font-family: 'Instrument Serif', serif; font-size: 18px; line-height: 1.25; margin-bottom: 8px; color: var(--ink); }
+    .bm-p { font-size: 12px; color: var(--ink-soft); line-height: 1.7; }
+
+    /* capture box anim */
+    .cap-box {
+      position: absolute;
+      top: 14px; left: 14px;
+      width: 0; height: 0;
+      border: 2px solid var(--tomato);
+      border-radius: 4px;
+      background: rgba(232,90,60,0.06);
+      transition: all 0.7s cubic-bezier(0.16,1,0.3,1);
+      pointer-events: none;
+    }
+    .cap-box.expanded { width: calc(100% - 28px); height: calc(100% - 28px); }
+    .cap-corner { position: absolute; width: 8px; height: 8px; border: 2px solid var(--tomato); border-radius: 1px; background: white; }
+    .cap-corner.tl { top: -5px; left: -5px; }
+    .cap-corner.tr { top: -5px; right: -5px; }
+    .cap-corner.bl { bottom: -5px; left: -5px; }
+    .cap-corner.br { bottom: -5px; right: -5px; }
+    .cap-send {
+      position: absolute; right: 8px; top: 8px;
+      background: var(--ink); color: var(--paper);
+      padding: 5px 12px; border-radius: 100px;
+      font-family: 'Caveat'; font-size: 16px;
+      opacity: 0; transition: opacity 0.4s;
+    }
+    .cap-send.visible { opacity: 1; }
+
+    /* highlight box anim */
+    .hl-mark { background: var(--mustard); padding: 1px 2px; border-radius: 2px; transition: background 0.4s; }
+    .hl-mark.active { background: var(--tomato); color: white; }
+    .hl-tooltip {
+      position: absolute; top: -36px; left: 50%; transform: translateX(-50%);
+      background: var(--ink); color: var(--paper);
+      padding: 5px 12px; border-radius: 100px;
+      font-family: 'Caveat'; font-size: 16px;
+      opacity: 0; transition: opacity 0.3s;
+      white-space: nowrap;
+    }
+    .hl-tooltip.visible { opacity: 1; }
+
+    .toolbar-pill-mini {
+      background: var(--ink); border-radius: 100px;
+      padding: 6px 12px; display: inline-flex; gap: 4px; align-items: center;
+      box-shadow: 0 4px 12px rgba(29,26,20,0.2);
+    }
+    .pb { width: 26px; height: 26px; border-radius: 6px; display: flex; align-items: center; justify-content: center; color: rgba(250,246,238,0.55); }
+    .pb.active { background: var(--tomato); color: white; }
+    .pb svg { width: 12px; height: 12px; }
+    .pill-bar { padding: 10px; display: flex; justify-content: center; background: var(--paper-2); border-top: 1px dashed var(--rule); }
+
+    /* SPLITVIEW — real screenshot */
+    .splitview-wrap { position: relative; margin-top: 48px; padding-bottom: 80px; }
+    .sv-real-shot {
+      background: white; padding: 18px;
+      position: relative;
+    }
+    .sv-real-shot img {
+      display: block; width: 100%; height: auto;
+      border-radius: 6px;
+      border: 1px solid var(--rule);
+      box-shadow: 0 12px 30px rgba(29,26,20,0.12);
+    }
+    .sv-annot {
+      position: absolute;
+      display: inline-flex; align-items: center; gap: 8px;
+      pointer-events: none;
+      z-index: 3;
+    }
+    .sv-annot .hand {
+      font-family: 'Caveat'; font-size: 26px; font-weight: 600;
+      color: var(--ink);
+      background: var(--mustard);
+      padding: 4px 16px;
+      border: 2px solid var(--ink);
+      border-radius: 100px;
+      box-shadow: 3px 3px 0 var(--ink);
+      white-space: nowrap;
+      line-height: 1.2;
+    }
+    .sv-annot-left { bottom: 0; left: 8%; }
+    .sv-annot-right { bottom: 0; right: 6%; }
+    .sv-annot-right .hand { background: var(--tomato); color: white; }
+
+    /* SPLITVIEW SECTION */
+    .splitview-card {
+      background: white;
+      border: 2px solid var(--ink);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 10px 10px 0 var(--olive);
+      transform: rotate(-0.3deg);
+    }
+    .splitview-bar {
+      background: #f6f1e3; padding: 10px 16px;
+      border-bottom: 1px dashed var(--rule);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .sv-tabs { flex: 1; display: flex; gap: 8px; }
+    .sv-tab {
+      flex: 1; background: white; border-radius: 4px;
+      padding: 4px 10px; font-size: 11px; color: var(--ink-soft);
+      font-family: 'JetBrains Mono', monospace;
+      text-align: center;
+      border: 1px solid var(--rule);
+    }
+    .sv-body { display: flex; height: 460px; }
+    .sv-left {
+      flex: 1; background: white;
+      border-right: 2px dashed var(--rule);
+      padding: 20px 24px;
+      position: relative;
+    }
+    .sv-right {
+      flex: 1; background: var(--paper-2);
+      padding: 20px 24px;
+      position: relative;
+      display: flex; flex-direction: column;
+    }
+    .sv-left h4, .sv-right h4 {
+      font-family: 'Instrument Serif', serif; font-weight: 400;
+      font-size: 22px; margin-bottom: 8px;
+    }
+    .sv-left .label, .sv-right .label {
+      font-family: 'Caveat'; color: var(--tomato); font-size: 18px; margin-bottom: 4px;
+    }
+    .sv-left p { font-size: 12px; color: var(--ink-soft); line-height: 1.7; margin-bottom: 8px; }
+    .chat-msg {
+      padding: 10px 14px; border-radius: 14px;
+      font-size: 12px; line-height: 1.5;
+      max-width: 85%; margin-bottom: 10px;
+    }
+    .chat-msg.user { background: var(--ink); color: var(--paper); align-self: flex-end; border-bottom-right-radius: 4px; }
+    .chat-msg.ai { background: white; color: var(--ink); border: 1px solid var(--rule); border-bottom-left-radius: 4px; }
+    .chat-msg.ai b { color: var(--tomato); }
+
+    /* PLATFORMS — handwritten roster */
+    .platforms-strip {
+      background: var(--paper-2);
+      padding: 60px 40px;
+      border-top: 2px dashed var(--rule);
+      border-bottom: 2px dashed var(--rule);
+      text-align: center;
+      position: relative; z-index: 1;
+    }
+    .platforms-strip h3 {
+      font-family: 'Caveat'; font-size: 32px; color: var(--ink-soft);
+      margin-bottom: 24px; transform: rotate(-1deg); display: inline-block;
+    }
+    .platforms-list {
+      display: flex; align-items: center; justify-content: center;
+      gap: 28px; flex-wrap: wrap;
+    }
+    .plat-pill {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: white;
+      padding: 10px 22px;
+      border-radius: 100px;
+      border: 2px solid var(--ink);
+      font-family: 'Instrument Serif', serif; font-size: 22px;
+      box-shadow: 3px 3px 0 var(--ink);
+    }
+    .plat-pill .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .plat-pill:nth-child(1) { transform: rotate(-2deg); }
+    .plat-pill:nth-child(2) { transform: rotate(1deg); }
+    .plat-pill:nth-child(3) { transform: rotate(-1deg); }
+    .plat-pill:nth-child(4) { transform: rotate(2deg); }
+
+    /* TESTIMONIAL / QUOTE */
+    .pull-quote {
+      max-width: 880px; margin: 0 auto;
+      text-align: center; padding: 80px 40px;
+      position: relative; z-index: 1;
+    }
+    .pull-quote .mark {
+      font-family: 'Instrument Serif', serif; font-style: italic;
+      font-size: 120px; line-height: 0.5; color: var(--tomato);
+      display: block; margin-bottom: 8px;
+    }
+    .pull-quote blockquote {
+      font-family: 'Instrument Serif', serif;
+      font-size: clamp(28px, 3.4vw, 44px);
+      line-height: 1.25; letter-spacing: -0.5px;
+      margin-bottom: 24px;
+    }
+    .pull-quote cite {
+      font-style: normal; font-family: 'Caveat'; font-size: 22px;
+      color: var(--ink-soft);
+    }
+
+    /* CTA */
+    .cta {
+      max-width: 1000px; margin: 0 auto;
+      padding: 80px 40px 120px;
+      text-align: center;
+      position: relative; z-index: 1;
+    }
+    .cta-card {
+      background: var(--ink); color: var(--paper);
+      padding: 70px 50px;
+      border-radius: 24px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 10px 10px 0 var(--tomato);
+    }
+    .cta-card h2 { color: var(--paper); margin-bottom: 14px; }
+    .cta-card h2 em { color: var(--mustard); }
+    .cta-card p { color: rgba(250,246,238,0.7); margin-bottom: 32px; max-width: 520px; margin-left: auto; margin-right: auto; }
+    .cta-card .btn { background: var(--tomato); border-color: var(--tomato); color: white; box-shadow: 4px 4px 0 var(--paper); }
+    .cta-card .btn:hover { box-shadow: 5px 5px 0 var(--paper); }
+
+    /* FOOTER */
+    footer {
+      padding: 36px 40px;
+      border-top: 1px dashed var(--rule);
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 13px; color: var(--ink-soft);
+      max-width: 1200px; margin: 0 auto;
+      position: relative; z-index: 1;
+    }
+    footer .signature { font-family: 'Caveat'; font-size: 22px; color: var(--ink); }
+
+    @media (max-width: 880px) {
+      .hero { grid-template-columns: 1fr; padding: 40px 24px 60px; }
+      .hero-visual { height: 400px; margin-top: 20px; }
+      section { padding: 60px 24px; }
+      .steps { grid-template-columns: 1fr; }
+      .step-arrow { display: none !important; }
+      .feature { grid-template-columns: 1fr; gap: 40px; }
+      .feature.reverse > :first-child { order: 1; }
+      .demo-row { grid-template-columns: 1fr; }
+      .sv-body { flex-direction: column; height: auto; }
+      .sv-left { border-right: none; border-bottom: 2px dashed var(--rule); }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">
+    <span class="mark"><i>AI&nbsp;Weaver</i></span>
+    <span class="sub">est. 2026</span>
+  </a>
+  <div class="nav-links">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#splitview">Split view</a>
+    <a href="privacy.html">Privacy</a>
+  </div>
+  <a href="#" class="btn tomato">
+    Add to Chrome
+    <svg viewBox="0 0 16 16" width="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+  </a>
+</nav>
+
+<!-- decorative doodles removed -->
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="hero-eyebrow">
+      a chrome extension
+    </div>
+    <h1>
+      Stop <span class="strike">tab-switching</span><br/>
+      to <em>talk to your AI.</em>
+    </h1>
+    <p class="hero-sub">
+      Highlight any sentence. Snip any chart. Send it to <b>ChatGPT, Gemini, or Claude</b> &mdash; without ever leaving the page you're on.
+    </p>
+    <div class="hero-actions">
+      <a href="#" class="btn tomato">
+        Add to Chrome — it's free
+        <svg viewBox="0 0 16 16" width="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+      </a>
+      <a href="#how" class="btn ghost">See how it works</a>
+    </div>
+    <div class="hero-meta">
+      <span class="star">★★★★★</span>
+      <span>Loved by 12,400+ readers, researchers &amp; tab-hoarders</span>
+    </div>
+  </div>
+
+  <div class="hero-visual">
+    <!-- Polaroid 1: Big toolbar -->
+    <div class="polaroid p1">
+      <div class="tape"></div>
+      <img src="assets/real-add-tools.png" alt="AI Weaver toolbar with Add Tools menu open" />
+      <div class="caption">the toolbar &mdash; with all the tools you'd want</div>
+    </div>
+    <!-- Polaroid 2: Toolbar with capture portion -->
+    <div class="polaroid p2">
+      <div class="tape"></div>
+      <img src="assets/real-toolbar-capture.png" alt="Toolbar with Capture portion tooltip" />
+      <div class="caption">point, drag, capture</div>
+    </div>
+    <!-- Sticky note -->
+    <div class="sticky-note s1">
+      one click<br/>
+      and it's<br/>
+      <u>in your chat.</u>
+    </div>
+    <!-- arrow doodle from sticky to polaroid -->
+    <svg class="doodle-arrow" style="top: 90px; right: 18%;" width="80" height="100" viewBox="0 0 80 100" fill="none">
+      <path d="M70 10 Q 30 30 20 70 L 18 60 M 20 70 L 30 64" stroke="#1d1a14" stroke-width="2" stroke-linecap="round" fill="none" stroke-dasharray="0 0"/>
+    </svg>
+  </div>
+</div>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span>
+      Highlight. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      Send. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      Ask. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      No more copy &amp; paste. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      Highlight. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      Send. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      Ask. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      No more copy &amp; paste. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </span>
+    <span>
+      Highlight. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      Send. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      Ask. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      No more copy &amp; paste. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      Highlight. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      Send. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      Ask. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+      No more copy &amp; paste. <svg width="24" height="20" viewBox="0 0 24 20"><path d="M2 10h18M14 4l6 6-6 6" stroke="#e2a93a" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+    </span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div style="text-align:center; max-width:680px; margin: 0 auto;">
+    <span class="sec-eyebrow">three steps. one tab.</span>
+    <h2>It's almost <em>embarrassingly</em> simple.</h2>
+    <p class="sec-desc" style="margin: 0 auto;">No setup. No new login. Just install the extension and the toolbar follows you wherever you read.</p>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">01</div>
+      <h3>Spot something interesting on a page.</h3>
+      <p>An article, a chart, a sentence in a research paper, a confusing error in a doc — anything you'd normally copy.</p>
+      <svg class="step-arrow" width="56" height="40" viewBox="0 0 56 40" fill="none">
+        <defs>
+          <marker id="arrow1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0 0 L10 5 L0 10" fill="none" stroke="#e85a3c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <path d="M2 20 Q 28 6 48 20" stroke="#e85a3c" stroke-width="2" stroke-linecap="round" fill="none" marker-end="url(#arrow1)"/>
+      </svg>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <h3>Highlight it, or snip a screenshot.</h3>
+      <p>Drag-select text the way you always have. Or click the camera in the toolbar and box around what you want.</p>
+      <svg class="step-arrow" width="56" height="40" viewBox="0 0 56 40" fill="none">
+        <defs>
+          <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+            <path d="M0 0 L10 5 L0 10" fill="none" stroke="#e85a3c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </marker>
+        </defs>
+        <path d="M2 20 Q 28 34 48 20" stroke="#e85a3c" stroke-width="2" stroke-linecap="round" fill="none" marker-end="url(#arrow2)"/>
+      </svg>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <h3>It's already in your AI chat.</h3>
+      <p>One tap and your selection lands in ChatGPT, Gemini, or Claude — with full context — ready for you to ask.</p>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE 1: capture (real screenshot) -->
+<section id="features">
+  <div class="feature">
+    <div>
+      <span class="sec-eyebrow">feature no. 1 — capture</span>
+      <h2>Snip <em>any corner</em> of any page.</h2>
+      <p class="sec-desc">A chart you can't copy as text. A diagram. A weird modal. A receipt. If you can see it, you can send it.</p>
+      <ul>
+        <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#e85a3c" stroke-width="2"/><path d="M6 10l3 3 5-6" stroke="#e85a3c" stroke-width="2" fill="none"/></svg> Drag to box around any region</li>
+        <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#e85a3c" stroke-width="2"/><path d="M6 10l3 3 5-6" stroke="#e85a3c" stroke-width="2" fill="none"/></svg> Lands in your AI chat as a real image</li>
+        <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#e85a3c" stroke-width="2"/><path d="M6 10l3 3 5-6" stroke="#e85a3c" stroke-width="2" fill="none"/></svg> Works on any website — even ones that block copy</li>
+      </ul>
+    </div>
+    <div class="feature-img-wrap tilt-r">
+      <img src="assets/real-berlin-page.png" alt="Capture in action — dragging a region on a Berlin events page" />
+      <div class="annot" style="top: -10px; right: 10px;">select any region</div>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURE 2: highlight (real toolbar screenshot) -->
+<section>
+  <div class="feature reverse">
+    <div>
+      <span class="sec-eyebrow">feature no. 2 — highlight</span>
+      <h2>The toolbar that <em>follows you</em> around.</h2>
+      <p class="sec-desc">A small floating dock sits quietly at the bottom of every page. Click it for a screenshot, a highlight, or to switch which AI you're talking to.</p>
+      <ul>
+        <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#e85a3c" stroke-width="2"/><path d="M6 10l3 3 5-6" stroke="#e85a3c" stroke-width="2" fill="none"/></svg> One-click switch between ChatGPT, Gemini, Claude</li>
+        <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#e85a3c" stroke-width="2"/><path d="M6 10l3 3 5-6" stroke="#e85a3c" stroke-width="2" fill="none"/></svg> Drag to wherever it suits you</li>
+        <li><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="8" stroke="#e85a3c" stroke-width="2"/><path d="M6 10l3 3 5-6" stroke="#e85a3c" stroke-width="2" fill="none"/></svg> Hide it whenever you want — it's not pushy</li>
+      </ul>
+    </div>
+    <div class="feature-img-wrap tilt-l">
+      <img src="assets/real-toolbar-models.png" alt="Toolbar showing model selector with Gemini, Claude, ChatGPT, Perplexity" />
+      <div class="annot" style="bottom: -10px; left: 20px; transform: rotate(3deg);">pick your AI</div>
+    </div>
+  </div>
+</section>
+
+<!-- ANIMATED MINI-DEMOS -->
+<section>
+  <div style="text-align:center; max-width:640px; margin: 0 auto;">
+    <span class="sec-eyebrow">live, in your browser</span>
+    <h2>Two ways to <em>send</em> something.</h2>
+  </div>
+  <div class="demo-row">
+    <!-- DEMO 1: capture -->
+    <div class="demo-card" id="cap-demo">
+      <div class="demo-head">
+        <div class="tag">no. 1</div>
+        <h3>Crop. Click. Sent.</h3>
+      </div>
+      <div class="demo-stage">
+        <div class="browser-mock">
+          <div class="bm-bar">
+            <div class="bm-dot"></div><div class="bm-dot"></div><div class="bm-dot"></div>
+            <div class="bm-url">notion.so / quarterly</div>
+          </div>
+          <div class="bm-body">
+            <div class="bm-eyebrow">Q3 Report</div>
+            <div class="bm-h">Revenue grew 34% YoY, driven primarily by enterprise contracts and APAC expansion.</div>
+            <div class="bm-p">Gross margin improved to 68.2%, up from 61.4% in the prior year. Operating expenses declined as a share of revenue.</div>
+            <div class="cap-box" id="capBox">
+              <div class="cap-corner tl"></div>
+              <div class="cap-corner tr"></div>
+              <div class="cap-corner bl"></div>
+              <div class="cap-corner br"></div>
+              <div class="cap-send" id="capSend">→ sent to <span id="capPlat">ChatGPT</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="pill-bar">
+        <div class="toolbar-pill-mini">
+          <div class="pb active"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="12" height="12" rx="2"/></svg></div>
+          <div class="pb"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12M2 8h8M2 12h6"/></svg></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DEMO 2: highlight -->
+    <div class="demo-card" id="hl-demo">
+      <div class="demo-head">
+        <div class="tag">no. 2</div>
+        <h3>Highlight, hover, ship.</h3>
+      </div>
+      <div class="demo-stage">
+        <div class="browser-mock">
+          <div class="bm-bar">
+            <div class="bm-dot"></div><div class="bm-dot"></div><div class="bm-dot"></div>
+            <div class="bm-url">arxiv.org / paper</div>
+          </div>
+          <div class="bm-body">
+            <div class="bm-eyebrow">research</div>
+            <p style="font-size:12px; color:#3a3528; line-height:1.8;">
+              The question isn't whether AI will change how we work — it's whether the tools we use will be
+              <span style="position:relative;">
+                <span class="hl-tooltip" id="hlTooltip">→ ask <span id="hlPlat">Gemini</span></span>
+                <span class="hl-mark" id="hlMark">seamlessly integrated into our workflows, or forever siloed in separate tabs.</span>
+              </span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="pill-bar">
+        <div class="toolbar-pill-mini">
+          <div class="pb"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="12" height="12" rx="2"/></svg></div>
+          <div class="pb active"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 4h12M2 8h8M2 12h6"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SPLIT VIEW -->
+<section id="splitview">
+  <div style="text-align:center; max-width:680px; margin: 0 auto;">
+    <span class="sec-eyebrow">our favorite setup</span>
+    <h2>Page on the left.<br/><em>Your AI</em> on the right.</h2>
+    <p class="sec-desc" style="margin: 0 auto;">Use Chrome's <b>Split View</b> or the built-in <b>Side Panel</b> &mdash; whichever fits your screen. Either way, the page is on one side and your AI is on the other, and AI Weaver shuttles context between them.</p>
+  </div>
+
+  <div class="splitview-wrap">
+    <div class="splitview-card">
+      <div class="splitview-bar">
+        <div class="bm-dot" style="background:#d4ccba"></div>
+        <div class="bm-dot" style="background:#d4ccba"></div>
+        <div class="bm-dot" style="background:#d4ccba"></div>
+        <div class="sv-tabs">
+          <div class="sv-tab">handpickedberlin.com / events</div>
+          <div class="sv-tab">gemini.google.com</div>
+        </div>
+      </div>
+      <div class="sv-real-shot">
+        <img src="assets/real-gemini-events.png" alt="AI Weaver in Chrome Split View — Berlin events page on the left, Gemini chat on the right" />
+      </div>
+    </div>
+    <div class="sv-annot sv-annot-left">
+      <span class="hand">snipped &amp; shipped</span>
+    </div>
+    <div class="sv-annot sv-annot-right">
+      <span class="hand">arrives in chat &mdash; with the source</span>
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORMS STRIP -->
+<div class="platforms-strip">
+  <h3>plays nicely with all your favorites</h3>
+  <div class="platforms-list">
+    <div class="plat-pill"><span class="dot" style="background:#4285f4;"></span>Gemini</div>
+    <div class="plat-pill"><span class="dot" style="background:#10a37f;"></span>ChatGPT</div>
+    <div class="plat-pill"><span class="dot" style="background:#cc785c;"></span>Claude</div>
+    <div class="plat-pill"><span class="dot" style="background:#20b8cd;"></span>Perplexity</div>
+  </div>
+</div>
+
+<!-- PULL QUOTE -->
+<div class="pull-quote">
+  <span class="mark">"</span>
+  <blockquote>I used to have <em>fourteen</em> tabs open just to ask my AI one question. Now I have one.</blockquote>
+  <cite>— a happy reader who now finishes their work before lunch</cite>
+</div>
+
+<!-- CTA -->
+<div class="cta">
+  <div class="cta-card">
+    <span class="sec-eyebrow" style="color: var(--mustard);">come on in, the water's fine</span>
+    <h2>Stop juggling tabs.<br/>Start <em>asking.</em></h2>
+    <p>Ten seconds to install. Free forever. Works with the AI you already pay for.</p>
+    <a href="#" class="btn">
+      Add AI Weaver to Chrome
+      <svg viewBox="0 0 16 16" width="14" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+    </a>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="signature">— AI Weaver, est. 2026</div>
+  <div>© 2026, made with too much coffee</div>
+  <div style="display:flex;gap:20px;">
+    <a href="privacy.html" style="color:var(--ink-soft);text-decoration:none;">Privacy</a>
+    <a href="#" style="color:var(--ink-soft);text-decoration:none;">Terms</a>
+  </div>
+</footer>
+
+<script>
+  // Capture demo loop
+  const capBox = document.getElementById('capBox');
+  const capSend = document.getElementById('capSend');
+  const capPlat = document.getElementById('capPlat');
+  const capPlats = ['ChatGPT', 'Gemini', 'Claude'];
+  let capIdx = 0;
+  function runCap() {
+    capBox.classList.add('expanded');
+    setTimeout(() => capSend.classList.add('visible'), 700);
+    setTimeout(() => {
+      capBox.classList.remove('expanded');
+      capSend.classList.remove('visible');
+      setTimeout(() => {
+        capIdx = (capIdx + 1) % capPlats.length;
+        capPlat.textContent = capPlats[capIdx];
+        runCap();
+      }, 800);
+    }, 3200);
+  }
+  let capStarted = false;
+  new IntersectionObserver(es => {
+    if (es[0].isIntersecting && !capStarted) { capStarted = true; setTimeout(runCap, 400); }
+  }, { threshold: 0.4 }).observe(document.getElementById('cap-demo'));
+
+  // Highlight demo loop
+  const hlMark = document.getElementById('hlMark');
+  const hlTooltip = document.getElementById('hlTooltip');
+  const hlPlat = document.getElementById('hlPlat');
+  const hlPlats = ['Gemini', 'ChatGPT', 'Claude'];
+  let hlIdx = 0;
+  function runHl() {
+    setTimeout(() => {
+      hlMark.classList.add('active');
+      setTimeout(() => hlTooltip.classList.add('visible'), 400);
+      setTimeout(() => {
+        hlMark.classList.remove('active');
+        hlTooltip.classList.remove('visible');
+        setTimeout(() => {
+          hlIdx = (hlIdx + 1) % hlPlats.length;
+          hlPlat.textContent = hlPlats[hlIdx];
+          runHl();
+        }, 500);
+      }, 2400);
+    }, 600);
+  }
+  let hlStarted = false;
+  new IntersectionObserver(es => {
+    if (es[0].isIntersecting && !hlStarted) { hlStarted = true; runHl(); }
+  }, { threshold: 0.4 }).observe(document.getElementById('hl-demo'));
+</script>
+
+</body>
+</html>

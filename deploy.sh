@@ -18,11 +18,8 @@ sed -i '' 's|href="final\.html"|href="./"|g' index.html
 sed -i '' 's|href="privacy-final\.html"|href="privacy.html"|g' index.html
 
 echo "→ Fixing image paths in index.html..."
-sed -i '' 's|src="assets/real-add-tools\.png"|src="screenshot/ai-weaver-add-tools-menu-small.png"|g' index.html
-sed -i '' 's|src="assets/real-toolbar-capture\.png"|src="screenshot/ai-weaver-toolbar-capture-portion.png"|g' index.html
-sed -i '' 's|src="assets/real-berlin-page\.png"|src="screenshot/berlin-events-page-modal.png"|g' index.html
-sed -i '' 's|src="assets/real-toolbar-models\.png"|src="screenshot/ai-weaver-toolbar-model-selector.png"|g' index.html
-sed -i '' 's|src="assets/real-gemini-events\.png"|src="screenshot/ai-weaver-gemini-event-recommendations.png"|g' index.html
+sed -i '' 's|src="assets/real-add-tools\.png"|src="screenshot/tasuku-toolkit.png"|g' index.html
+sed -i '' 's|src="assets/real-toolbar-capture\.png"|src="screenshot/tasuku-select-text-ui.png"|g' index.html
 
 echo "→ Staging and pushing..."
 git add -A

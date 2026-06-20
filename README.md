@@ -1,6 +1,6 @@
-# AI Weaver — Landing Page
+# Tasuku — Landing Page
 
-Static landing page deployed to GitHub Pages at **https://rrthurein.github.io/ai-weaver/**
+Static landing page deployed to GitHub Pages at **https://rrthurein.github.io/tasuku/**
 
 ## Files
 

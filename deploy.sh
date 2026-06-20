@@ -31,4 +31,4 @@ git -c http.postBuffer=524288000 \
     -c credential.helper='!f() { echo "username=rrthurein"; echo "password=$(gh auth token)"; }; f' \
     push origin main
 
-echo "✓ Done — https://rrthurein.github.io/ai-weaver/"
+echo "✓ Done — https://rrthurein.github.io/tasuku/"
